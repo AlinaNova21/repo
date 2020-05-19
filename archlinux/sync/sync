@@ -42,6 +42,7 @@ PKGDEST='$LOCAL_PATH'
 PKGEXT='.pkg.tar.zst'
 SRCEXT='.src.tar.zst'
 BUILDDIR=/tmp/pkgbuild
+SRCDEST=/tmp/pkgsrc
 EOF
 
 sudo -u builder aur sync --noview --noconfirm ${PKGS[*]}
