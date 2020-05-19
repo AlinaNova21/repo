@@ -1,0 +1,44 @@
+#!/bin/bash
+set -x
+REPO=ags131
+URL=https://repo-ags131.nyc3.digitaloceanspaces.com
+ARCH=${ARCH:-x86_64}
+
+LOCAL_PATH=/tmp/archlinux
+REMOTE_PATH=spaces:repo-ags131/archlinux/$REPO/os/$ARCH
+RCLONE='rclone --config archlinux/sync/rclone.conf --s3-acl public-read -LP --transfers=15'
+
+cat - <<EOF >> /etc/pacman.conf
+[$REPO]
+SigLevel = Optional TrustAll
+Server = file://${LOCAL_PATH}
+Server = ${URL}/archlinux/\$repo/os/\$arch
+EOF
+
+cat /proc/sys/kernel/random/uuid | sed 's/[^a-z0-9]//g' > /etc/machine-id
+
+pacman -Syu --noconfirm
+pacman -S --noconfirm \
+  autoconf automake binutils bison fakeroot file findutils flex gawk gcc gettext grep groff gzip libtool m4 make pacman patch pkgconf sed sudo sudo texinfo which \
+  devtools sudo aurutils rclone
+useradd -m -G wheel -s /bin/bash builder
+echo "%wheel ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/wheel
+readarray -t PKGS < archlinux/packages-aur
+
+mkdir -p $LOCAL_PATH
+chown builder.builder $LOCAL_PATH
+
+$RCLONE copy $REMOTE_PATH/$REPO.db.tar.zst $LOCAL_PATH
+$RCLONE copy $REMOTE_PATH/$REPO.files.tar.zst $LOCAL_PATH
+ln -sf $REPO.db.tar.zst $LOCAL_PATH/$REPO.db
+ln -sf $REPO.files.tar.zst $LOCAL_PATH/$REPO.files
+
+chown builder.builder $LOCAL_PATH/*
+
+rm -f $LOCAL_PATH/*.pkg.tar*
+
+sudo -u builder aur sync --noview --noconfirm ${PKGS[*]}
+sudo -u builder aur sync --noview --noconfirm -u
+
+$RCLONE copy $LOCAL_PATH $REMOTE_PATH
+

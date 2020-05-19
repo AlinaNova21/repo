@@ -1,0 +1,14 @@
+#!/bin/bash
+set -x
+
+GITHUB_WORKSPACE=${GITHUB_WORKSPACE:-$PWD}
+
+docker run --rm -it \
+  --privileged \
+  -v /var/cache/pacman/pkg:/var/cache/pacman/pkg \
+  -v $GITHUB_WORKSPACE:$GITHUB_WORKSPACE \
+  -e GITHUB_WORKSPACE=$GITHUB_WORKSPACE \
+  -e AWS_ACCESS_KEY_ID \
+  -e AWS_SECRET_ACCESS_KEY \
+  -w $GITHUB_WORKSPACE \
+  archlinux archlinux/sync/sync

@@ -1,0 +1,13 @@
+name: ArchLinux Repo
+
+on:
+  schedule:
+  - cron: '0 0 * * *'
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Update packages
+      run: archlinux/sync/ci

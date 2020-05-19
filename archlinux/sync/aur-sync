@@ -1,0 +1,25 @@
+#!/bin/bash
+set -x
+
+REPO=ags131
+ARCH=${ARCH:-x86_64}
+
+LOCAL_PATH=./archlinux/ags131/os/x86_64/
+RCLONE='rclone --config archlinux/sync/rclone.conf -LP --transfers=15'
+REMOTE_PATH=spaces:repo-ags131/archlinux/$REPO/os/$ARCH
+
+mkdir -p $LOCAL_PATH
+pushd $LOCAL_PATH
+
+$RCLONE copy $REMOTE_PATH/$REPO.db.tar $LOCAL_PATH
+$RCLONE copy $REMOTE_PATH/$REPO.files.tar $LOCAL_PATH
+ln -sf $REPO.db.tar $REPO.db
+ln -sf $REPO.files.tar $REPO.files
+
+rm -f *.pkg.tar*
+
+[[ $# -gt 0 ]] && aur sync -c --noview $@
+
+aur sync -u --noview
+
+$RCLONE copy $LOCAL_PATH $REMOTE_PATH
