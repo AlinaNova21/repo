@@ -4,7 +4,7 @@ REPO=ags131
 URL=https://repo-ags131.nyc3.digitaloceanspaces.com
 ARCH=${ARCH:-x86_64}
 
-LOCAL_PATH=/tmp/archlinux
+export LOCAL_PATH=/tmp/archlinux
 REMOTE_PATH=spaces:repo-ags131/archlinux/$REPO/os/$ARCH
 RCLONE='rclone --config archlinux/sync/rclone.conf --s3-acl public-read -LP --transfers=15'
 
@@ -36,9 +36,19 @@ ln -sf $REPO.files.tar.zst $LOCAL_PATH/$REPO.files
 chown builder.builder $LOCAL_PATH/*
 
 rm -f $LOCAL_PATH/*.pkg.tar*
+cat - <<EOF >> /etc/makepkg.conf
+COMPRESSZST=(zstd -c -z -q - --threads=0)
+PKGDEST='$LOCAL_PATH'
+PKGEXT='.pkg.tar.zst'
+SRCEXT='.src.tar.zst'
+BUILDDIR=/tmp/pkgbuild
+EOF
 
 sudo -u builder aur sync --noview --noconfirm ${PKGS[*]}
-sudo -u builder aur sync --noview --noconfirm -u
+sudo -u builder archlinux/sync/build-local
+repo-add $LOCAL_PATH/$REPO.db.tar.zst $LOCAL_PATH/*.pkg.tar.zst
+
+ls -lah $LOCAL_PATH
 
 $RCLONE copy $LOCAL_PATH $REMOTE_PATH
 

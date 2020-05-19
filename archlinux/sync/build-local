@@ -1,0 +1,9 @@
+#!/bin/bash
+set -x
+for pkg in archlinux/pkg/*/
+do
+  pushd $pkg
+  rm *.pkg.tar*
+  makepkg -s --noconfirm  
+  popd
+done

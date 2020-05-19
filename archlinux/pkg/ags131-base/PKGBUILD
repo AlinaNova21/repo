@@ -1,0 +1,60 @@
+# Maintainer: Adam Shumann <ags131@github.com>
+pkgname=ags131-base
+pkgver=0.0.1
+pkgrel=1
+pkgdesc="Base system configuration for ags131 systems"
+arch=('any')
+url="https://github.com/ags131/repo"
+license=('MIT')
+depends=(
+  'base'
+  'bat'
+  'bind-tools'
+  'dosfstools'
+  'efibootmgr'
+  'figlet'
+  'git'
+  'htop'
+  'httpie'
+  'hub'
+  'iotop'
+  'iperf'
+  'iproute2'
+  'jq'
+  'less'
+  'lvm2'
+  'mtr'
+  'nano'
+  'ncdu'
+  'ntp'
+  'openssh'
+  'rclone'
+  'rsync'
+  'sed'
+  'smartmontools'
+  'squashfs-tools'
+  'sudo'
+  'sysstat'
+  'tmux'
+  'unzip'
+  'wget'
+  'whois'
+  'wireguard-tools'
+  'yadm'
+  'yup'
+  'zip'
+  'zsh'
+)
+source=('sudoers.wheel'
+        'sudoers.sudo')
+sha256sums=('398a214dcb4f0359be4bdd0354f0301c2da70186fc71f2e50182abb334bb4044'
+            '65b0519a67a9c32e12747b61f260b5f5fd934f98e6de3e87398997ace90c3c63')
+
+package() {
+  install -Dm 0640 sudoers.wheel "$pkgdir/etc/sudoers.d/wheel"
+  install -Dm 0640 sudoers.sudo "$pkgdir/etc/sudoers.d/sudo"
+}
+post_install() {
+  systemctl enable --now openssh
+  systemctl enable --now ntpd
+}
