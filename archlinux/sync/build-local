@@ -4,6 +4,7 @@ for pkg in archlinux/pkg/*/
 do
   pushd $pkg
   rm *.pkg.tar*
-  makepkg -s --noconfirm  
+  . PKGBUILD
+  aur repo -l | grep $(basename $pkg)"\W$pkgver-$pkgrel" || makepkg -s --noconfirm
   popd
 done
