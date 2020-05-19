@@ -3,7 +3,7 @@ set -x
 
 GITHUB_WORKSPACE=${GITHUB_WORKSPACE:-$PWD}
 
-docker run --rm -it \
+docker run --rm \
   --privileged \
   -v /var/cache/pacman/pkg:/var/cache/pacman/pkg \
   -v $GITHUB_WORKSPACE:$GITHUB_WORKSPACE \
