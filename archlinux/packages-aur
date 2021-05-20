@@ -3,6 +3,8 @@ caddy2
 etcher-bin
 foldingathome
 google-chrome
+jsonnet
+jsonnet-bundler-bin
 keybase-bin
 micro
 nerd-fonts-fira-code
@@ -10,6 +12,7 @@ polybar
 radeontop
 rtl8821au-dkms-git
 slack-desktop
+tanka-bin
 visual-studio-code-bin
 yadm
 yay
